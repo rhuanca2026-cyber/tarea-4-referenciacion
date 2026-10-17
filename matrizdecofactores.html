@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Matriz de Cofactores</title>
+</head>
+<body>
+  <h2>Calcular matriz de cofactores</h2>
+
+  <p>Introduce la matriz (ejemplo: [[1,2,3],[0,4,5],[1,0,6]])</p>
+  <textarea id="matrizInput" rows="4" cols="40"></textarea><br><br>
+  <button onclick="calcularCofactores()">Calcular</button>
+
+  <h3>Resultado:</h3>
+  <pre id="resultado"></pre>
+
+  <script>
+    // Función para calcular el determinante de una matriz
+    function determinante(matriz) {
+      const n = matriz.length;
+      if (n === 1) return matriz[0][0];
+      if (n === 2) return matriz[0][0]*matriz[1][1] - matriz[0][1]*matriz[1][0];
+
+      let det = 0;
+      for (let j = 0; j < n; j++) {
+        const submatriz = matriz.slice(1).map(fila =>
+          fila.filter((_, col) => col !== j)
+        );
+        det += ((j % 2 === 0 ? 1 : -1) * matriz[0][j] * determinante(submatriz));
+      }
+      return det;
+    }
+
+    // Función para calcular la matriz de cofactores
+    function matrizCofactores(matriz) {
+      const n = matriz.length;
+      const cofactores = Array.from({ length: n }, () => Array(n).fill(0));
+
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          // Crear submatriz eliminando fila i y columna j
+          const submatriz = matriz
+            .filter((_, fila) => fila !== i)
+            .map(fila => fila.filter((_, col) => col !== j));
+
+          cofactores[i][j] = Math.pow(-1, i + j) * determinante(submatriz);
+        }
+      }
+      return cofactores;
+    }
+
+    // Función principal
+    function calcularCofactores() {
+      const input = document.getElementById("matrizInput").value;
+      try {
+        const matriz = JSON.parse(input);
+        const resultado = matrizCofactores(matriz);
+        document.getElementById("resultado").textContent = JSON.stringify(resultado, null, 2);
+      } catch (e) {
+        document.getElementById("resultado").textContent = "Error: asegúrate de ingresar una matriz válida.";
+      }
+    }
+  </script>
+</body>
+</html>
